@@ -1,26 +1,38 @@
 # RpiRoadbook
-Roadbook numérique à partir d'un Raspberry Pi
+Digital roadbook from a Raspberry Pi
 
-## Idée de départ
+## Starting idea
 
-Pour les rallyes moto du Championnat de France de Rallye Routier, ou pour mes propres balades, j'utilise pour l'instant un dérouleur "papier". La version électrique permet avec une télécommande, de faire avance ou reculer les cases du roadbook pour suivre sa navigation. 
+For motorcycle rallies of the French Road Rally Championship, or for my own rides, I currently use a "paper" dispenser. The electric version allows with a remote control, to advance or move back the boxes of the roadbook to follow its navigation.
 
-Un produit existe pour passer au dérouleur électronique (IzRoadbook, à base de liseuse), mais le prix et le fait que pour l'instant il est destiné uniquement aux rallyes du CFRR ne permettent pas de l'utiliser pour ses propres balades ou de réutiliser la liseuse pour lire ses romans.
+A product exists to switch to the electronic unwinder (IzRoadbook, based on e-reader), but the price and the fact that for the moment it is intended only for CFRR rallies do not allow it to be used for its own walks or to reuse the reader to read her novels.
 
-Pour mes besoins de création de roadbooks de balade, j'ai donc commencé à coder un site pour générer les cases qui vont bien (accessible [ici](http://tqhien.free.fr/) ). Vient ensuite le moment de développer la partie "terrain" du roadbook : le dérouleur. Les critères sont les suivants : composants accessibles à tout le monde, design différent de ce qui existe, et réutilisation pour autre chose que le dérouleur. Cela se traduit par un écran d'une dimension suffisante (7 pouces), tactile et visible même en plein soleil (800cd/m2). Pas trop cher (le Rasperry Pi est idéal pour ça) et pouvant remplacer le dérouleur et le trip que j'ai actuellement au guidon.
+For my needs to create ride roadbooks, I therefore started to code a site to generate the boxes which go well (accessible [here] (http://tqhien.free.fr/)). Then comes the time to develop the "field" part of the roadbook: the unwinder. The criteria are as follows: components accessible to everyone, design different from what exists, and re-use for something other than the unwinder. This results in a screen of sufficient size (7 inches), tactile and visible even in direct sunlight (800cd / m2). Not too expensive (the Rasperry Pi is ideal for that) and can replace the unwinder and the trip I currently have on the handlebars.
 
-## Approche linux embarquée
+## Embedded Linux approach
 
-Pour un système embarqué sur une moto, la problématique est l'alimentation du rpi et la sécurité de la carte mémoire. Je m'explique. Normalement, avec la distribution Raspbian le rpi fonctionne comme un ordinateur : il lit et écrit sur le disque (la sdcard) en démarrant et doit sauvegarder des choses à l'extinction. En cas de coupure de courant à répétitions, il est fréquent d'aboutir à une corruption de la carte SD et la perte des données.
+For a system on board a motorcycle, the problem is the power of the rpi and the security of the memory card. Let me explain. Normally, with the Raspbian distribution, the rpi works like a computer: it reads and writes to the disk (the sdcard) when starting up and must save things when it is shut down. In the event of a repeated power outage, it is common to result in corruption of the SD card and loss of data.
 
-Le passage à l'embarqué répond à des besoins différents : démarrage rapide et sécurité en cas de coupure de courant. Cela signifie notamment une carte mémoire en lecture seule : pas de corruption de la carte mémoire en cas d'extinction intempestive. Il y a juste une partition de la carte qui est en écriture, pour sauvegarder de temps en temps les données utilisateurs. La création de son propre système d'exploitation est un peu longue à réaliser, car il faut sélectionner les éléments nécessaires et rejeter les autres puis compiler à partir du code source. D'habitude, on crée ces fichiers sur l'architecture qui recevra le système. Par exemple sur PC pour du PC, sur un Mac pour du Mac, etc. Si on le fait sur le Rpi, c'est long. Très long. Donc il s'agit d'utiliser la puissance de son ordinateur pour générer plus rapidement le code que comprendra le Rpi. On appelle cela de la Cross-compilation. C'est l'objet du chapitre suivant : Builroot.
+Switching to on-board vehicles meets different needs: quick start-up and security in the event of a power failure. This means in particular a read-only memory card: no corruption of the memory card in the event of untimely extinction. There is just a partition on the card that is in write mode, to save user data from time to time. Creating your own operating system takes a long time, because you have to select the necessary elements and reject the others, then compile from source code. Usually, these files are created on the architecture that will receive the system. For example on PC for PC, on a Mac for Mac, etc. If we do it on the Rpi, it's long. Very long. So it's about using the power of your computer to generate more quickly the code that the Rpi will understand. This is called Cross-compilation. This is the subject of the following chapter: Builroot.
 
-## Buildroot et Raspberry Pi
-A venir...
+## Setup
+- Download a version of [Make](https://sourceforge.net/projects/gnuwin32/files/make/3.81/make-3.81.exe/download?use_mirror=netix&download=)
+- Add `make` to `PATH`
+- Download a version of [BuildRoot](https://buildroot.org/download.html)
+- Extract BuildRoot using `tar xvjf buildroot-XXXX`
+- Download a version of [Python 3](https://www.python.org/downloads/)
+- Add `python` to `PATH`
+- Have `Microsoft Visual C++ Build Tools` installed from [Visual Studio](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017), see [this](https://github.com/benfred/implicit/issues/76#issuecomment-404889398) for help
+- Change directory into the `RpiRoadbook` src folder
+- run `pip install -r requirements.txt`
 
 
-## Application Python / Lecteur de PDF / Trip
-A venir...
+## Buildroot and Raspberry Pi
+To come up...
 
-## Télécommande
-A venir...
+
+## Python application / PDF reader / Trip
+To come up...
+
+## Remote control
+To come up...
