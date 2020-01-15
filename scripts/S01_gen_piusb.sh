@@ -1,5 +1,5 @@
 #!/bin/sh
-# On recupere les secteurs deja utilises et on calcule la taille des deux partitions a creer
+# We recover the sectors already used and we calculate the size of the two partitions to create
 DISK_SIZE=$(fdisk -l /dev/mmcblk0 | grep Disk | awk '{print $7-1}')
 LAST_SECTOR=$(fdisk -l /dev/mmcblk0 | grep mmcblk0p2 | awk '{print $5+1}')
 echo $DISK_SIZE
@@ -9,7 +9,7 @@ let HALF_SIZE=$FREE_SIZE/2
 echo $FREE_SIZE
 echo $HALF_SIZE
 
-# on va creer les partitions avec fdisk
+# we will create partitions with fdisk
 sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /dev/mmcblk0
   n # new partition
   p # primary partition
@@ -24,21 +24,21 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /dev/mmcblk0
   w # save and quit
 EOF
 
-# on copie la suite du traitement
+# we copy the rest of the treatment
 mount / -o rw,remount
 sleep .5
 cp /home/rpi/scripts/S02_gen_btrfs.sh /etc/init.d/S02_gen_btrfs.sh
 chmod +x /etc/init.d/S02_gen_btrfs.sh
 
-# on supprime le script courant
+# we delete the current script
 rm /etc/init.d/S01_gen_piusb.sh
 
-# on s'assure d'ecrire le cache sue le disque
+# we make sure to write the cache on the disc
 sync
 mount / -o ro,remount
-# deux securites valent mieux qu'une
+# two securities are better than one
 sleep 5
-# on redemarre
+# we restart
 reboot
 
 

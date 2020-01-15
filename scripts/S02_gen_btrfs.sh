@@ -1,31 +1,31 @@
 #!/bin/sh
 
-# inserer ici l'affichage de l'image d'info
+# insert here the display of the info image
 # dd if=/root/update.fb of=/dev/fb0 bs=1536000 count=1 > /dev/null 2>&1
-# on cree le noeud udev pour le btrfs
+# we create the node udev for the btrfs
 mknod /dev/btrfs-control c 10 234
-# on cree le systeme de fichiers btrfs sur la partition 3
+# we create the btrfs filesystem on partition 3
 mkfs.btrfs -f /dev/mmcblk0p3
-# idem sur la partition 4
+# ditto on partition 4
 mkfs.btrfs -f /dev/mmcblk0p4
-# On monte la 1ere partition
+# We mount the 1st partition
 mount /dev/mmcblk0p3 /mnt/piusb
-# On ajoute la 2eme partition
+# We add the 2nd partition
 btrfs device add -f /dev/mmcblk0p4 /mnt/piusb
-# et on definit le raid miroir
+# and we define the mirror raid
 btrfs balance start -dconvert=raid1 -mconvert=raid1 /mnt/piusb
 
-# maintenant on peut decompresser l'archive initiale
+# now we can decompress the initial archive
 mount / -o rw,remount
 sleep .5
 tar -C / -xvf "/home/rpi/scripts/init.tar.gz"
 sleep .5
 
-# on supprime le script courant
+# we delete the current script
 rm /etc/init.d/S02_gen_btrfs.sh
 sync
 mount / -o ro,remount
 
-# et on redemarre une derniere fois
+# and we restart for the last time
 reboot
 

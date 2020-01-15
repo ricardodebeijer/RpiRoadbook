@@ -1,45 +1,11 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Oct 15 08:58:53 2018
 
-@author: Hien TRAN-QUANG
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>
-
-Ce programme est un logiciel libre ; vous pouvez le redistribuer ou le modifier
-suivant les termes de la GNU General Public License telle que publiée par la
-Free Software Foundation ; soit la version 3 de la licence, soit (à votre gré)
-toute version ultérieure.
-
-Ce programme est distribué dans l'espoir qu'il sera utile, mais SANS AUCUNE GARANTIE ;
-sans même la garantie tacite de QUALITÉ MARCHANDE ou d'ADÉQUATION à UN BUT PARTICULIER.
-Consultez la GNU General Public License pour plus de détails.
-
-Vous devez avoir reçu une copie de la GNU General Public License en même temps que ce programme ;
-si ce n'est pas le cas, consultez <http://www.gnu.org/licenses>
-
-Ce programme s'appuie sur la bibliothèque gratuit et open-source Pygame pour Python : <http://www.pygame.org>
-et s'est inspiré de <https://nerdparadise.com/programming/pygame/part7> pour la class d'objet des scènes
-"""
-
-# Pour masquer le message de la version de pygame
+# To hide the message of the pygame version
 #import contextlib
 #with contextlib.redirect_stdout(None):
 import pygame.display
 
-# Pour l'affichage sur le framebuffer
+# For display on the framebuffer
 from pygame.locals import *
 
 import time
@@ -49,11 +15,12 @@ import configparser
 import re
 import math
 # import serial
-# Pour la lecture des fichiers pdf et conversion en image
+# For reading pdf files and converting to image
 from pdf2image import page_count,convert_from_path,page_size
 import subprocess
 
-import RPi.GPIO as GPIO
+# TODO: When on Pi, should use GPIO
+# import RPi.GPIO as GPIO
 
 # Pour la gestion du touchscreen
 import sys
@@ -120,17 +87,17 @@ rb_ratio = 1
 boutonsTrip = 1
 boutonsRB = 1
 
-CAPTEUR_ROUE    = USEREVENT # Odometre
-BOUTON_LEFT     = pygame.K_LEFT # Bouton left (tout en haut)
-BOUTON_HOME     = pygame.K_HOME # Bouton left long
-BOUTON_RIGHT    = pygame.K_RIGHT # Bouton right (2eme en haut)
-BOUTON_END      = pygame.K_END # Bouton right long
-BOUTON_OK       = pygame.K_RETURN # Bouton OK/select (au milieu)
-BOUTON_BACKSPACE = pygame.K_BACKSPACE # Bouton OK long
-BOUTON_UP       = pygame.K_UP # Bouton Up (1er en bas)
-BOUTON_PGUP     = pygame.K_PAGEUP # Bouton UP long
-BOUTON_DOWN     = pygame.K_DOWN # Bouton Down (tout en bas)
-BOUTON_PGDOWN  = pygame.K_PAGEDOWN # Bouton Down long
+CAPTEUR_ROUE    = USEREVENT # Odometer
+BOUTON_LEFT     = pygame.K_LEFT # Left button (at the very top)
+BOUTON_HOME     = pygame.K_HOME # Left long button
+BOUTON_RIGHT    = pygame.K_RIGHT # Right button (2nd above)
+BOUTON_END      = pygame.K_END # Right long button
+BOUTON_OK       = pygame.K_RETURN # OK / select button (middle)
+BOUTON_BACKSPACE = pygame.K_BACKSPACE # OK button long
+BOUTON_UP       = pygame.K_UP # Up button (1st down)
+BOUTON_PGUP     = pygame.K_PAGEUP # Long UP button
+BOUTON_DOWN     = pygame.K_DOWN # Down button (bottom)
+BOUTON_PGDOWN  = pygame.K_PAGEDOWN # Long Down button
 
 GPIO_ROUE = 17
 GPIO_LEFT = 27
@@ -145,11 +112,11 @@ right_state = False
 up_state = False
 down_state = False
 
-fr = gettext.translation('rpiroadbook', localedir='locales', languages=['fr'])
+# fr = gettext.translation('rpiroadbook', localedir='locales', languages=['fr'])
 en = gettext.translation('rpiroadbook', localedir='locales', languages=['en'])
-it = gettext.translation('rpiroadbook', localedir='locales', languages=['it'])
-de = gettext.translation('rpiroadbook', localedir='locales', languages=['de'])
-es = gettext.translation('rpiroadbook', localedir='locales', languages=['es'])
+# it = gettext.translation('rpiroadbook', localedir='locales', languages=['it'])
+# de = gettext.translation('rpiroadbook', localedir='locales', languages=['de'])
+# es = gettext.translation('rpiroadbook', localedir='locales', languages=['es'])
 
 # On charge les reglages des boutons
 setupconfig = configparser.ConfigParser()
@@ -160,21 +127,21 @@ boutonsRB = setupconfig['Parametres']['boutonsRB']
 # boutonsPull = setupconfig['Parametres']['boutonsPull']
 boutonsPull = 'Up'
 
-# Logfile pour debogage
+# Logfile for debugging
 def logdebug (st) :
     with open('/mnt/piusb/thumbnail/debug.log','a') as f:
         f.write('{}\n'.format(st))
 
-# Fonction qui renvoie l'etat du bouton, si le montage est en pull-up
+# Function which returns the state of the button, if the montage is in pull-up
 def bouton_pressed_pup (channel):
     return not GPIO.input(channel)
 
-# Fonction qui renvoie l'etat du bouton, si le montage est en pull-down
+# Function which returns the state of the button, if the assembly is in pull-down
 def bouton_pressed_pdown (channel):
     return GPIO.input(channel)
 
 GPIO.setmode(GPIO.BCM)
-# Selon le mode : pullup ou pulldown, on definit le sens du front a detecter et la fonction etat du bouton
+# Depending on the mode: pullup or pulldown, we define the direction of the forehead to detect and the button state function
 if boutonsPull == 'Up' :
     edge = GPIO.FALLING
     bouton_pressed = bouton_pressed_pup
@@ -194,11 +161,11 @@ GPIO.setup(GPIO_UP, GPIO.IN)
 #GPIO.setup(GPIO_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(GPIO_DOWN, GPIO.IN)
 
-# Test bouton au démarrage pour menu de configuration
+# Button test at startup for configuration menu
 gotoConfig = GPIO.input(GPIO_LEFT) != GPIO.input(GPIO_RIGHT)
 
 #*******************************************************************************************************#
-#------------------------- Les callbacks des interruptions GPIO et fonctions utiles --------------------#
+#------------------------- GPIO interrupt callbacks and useful functions --------------------#
 #*******************************************************************************************************#
 def input_roue_callback(channel):
     global totalisateur,old_totalisateur,distance,developpe
@@ -213,14 +180,14 @@ def input_roue_callback(channel):
     distance1 += developpe
     distance2 += developpe
 
-    # gestion du demarrage du chrono1
-    # Valeur > 1 : on attend de faire suffisamment de tours de roue
-    # Valeur = 1 : on demarre le chrono1
-    # Valeur = 0 : le chrono1 est demarre
+    # management of the start of chrono1
+    # Value> 1: we wait to make enough wheel turns
+    # Value = 1: we start chrono1
+    # Value = 0: chrono1 is started
     chrono_delay1 -= 1
     if chrono_delay1 < 0 :
         chrono_delay1 = 0
-    # Test si on doit demarrer le chrono1
+    # Test if we should start chrono1
     elif chrono_delay1 == 1 :
         chrono_time1 = time.time()
         chrono_delay1 = 0
@@ -232,7 +199,7 @@ def input_roue_callback(channel):
     chrono_delay2 -= 1
     if chrono_delay2 < 0 :
         chrono_delay2 = 0
-    # Test si on doit demarrer le chrono2
+    # Test if we should start chrono2
     elif chrono_delay2 == 1 :
         chrono_time2 = time.time()
         chrono_delay2 = 0
@@ -406,7 +373,7 @@ else :
 
 
 #*******************************************************************************************************#
-#------------------------- Le callbacks des suivis systeme : temp et cpu -------------------------------#
+#------------------------- System follow-up callbacks: temp and cpu -------------------------------#
 #*******************************************************************************************************#
 
 def rpi_temp():
@@ -428,12 +395,12 @@ def cpu_load():
         cpu = -1
 
 #-----------------------------------------------------------------------------------------------#
-#----------------------------- Gestion des images en cache -------------------------------------#
+#----------------------------- Cache image management -------------------------------------#
 #-----------------------------------------------------------------------------------------------#
 image_cache = {}
 def get_image(key,angle=0,mode_jour=True):
     global filedir,fichiers,image_cache
-    # Chargement des images uniquement si pas encore en cache
+    # Loading images only if not yet cached
     if not (key,angle,mode_jour) in image_cache:
         img = pygame.image.load(os.path.join('/mnt/piusb/Conversions/'+filedir,fichiers[key]))
         if mode_jour:
@@ -454,7 +421,7 @@ def get_image(key,angle=0,mode_jour=True):
 
 
 #-------------------------------------------------------------------------------------------#
-#------------------------------ Optimisation des rendus des textes -------------------------#
+#------------------------------ Optimization of text rendering -------------------------#
 #-------------------------------------------------------------------------------------------#
 
 mode_jour = True
@@ -579,7 +546,7 @@ def update_labels(screen):
             old_labels [i] = labels[i]
 
 #--------------------------------------------------------------------------------- ----------#
-#------------------------------ Optimisation des rendus des sprites -------------------------#
+#------------------------------ Optimization of sprite renderings -------------------------#
 #---------------------------------------------------------------------------------- ---------#
 
 sprites = {}
@@ -828,8 +795,8 @@ def widget_dispatch(st,layout,widget):
     else :
         return rb_widget(layout,widget)
 
-#------------------ Affichage de l'heure, de la charge cpu et de la temperature du rpi ------------------------------#
-#------ Actions possibles : changement d'affichage personnalise sur appui long ok (reset)-----------------------------------#
+#------------------ Display of time, cpu load and rpi temperature ------------------------------#
+#------  Possible actions: change of personalized display on long press ok (reset)-----------------------------------#
 class status_widget (rb_widget):
     def __init__(self,layout='0',widget=0):
         global angle
@@ -837,7 +804,7 @@ class status_widget (rb_widget):
     def reset(self):
         global widgets,current_screen,screenconfig,nb_widgets,ncases,sprites,old_sprites,mode_jour,force_refresh,rbconfig,default_widget
 
-        # On charge le mode en cours, le roadbook en cours et sa case
+        # We load the current mode, the current roadbook and its box
         candidates = ['/home/rpi/RpiRoadbook/RpiRoadbook.cfg','/mnt/piusb/.conf/RpiRoadbook.cfg']
         rbconfig.read(candidates)
         rallye = rbconfig['Mode']['mode']
@@ -900,8 +867,8 @@ class status_widget (rb_widget):
         r = pygame.draw.rect(scr,GRIS,(self.x,self.y,self.w,self.h),1)
         pygame.display.update(r)
 
-#------------------ Affichage du totalisateur                                             ------------------------------#
-#------ Actions possibles : aucun                                                    -----------------------------------#
+#------------------ Totalizer display                                          ------------------------------#
+#------ Possible actions: none                                                 -----------------------------------#
 class odo_widget (rb_widget):
     def __init__(self,layout='1',widget=0):
         rb_widget.__init__(self,layout,widget)
@@ -916,8 +883,8 @@ class odo_widget (rb_widget):
         r = pygame.draw.rect(scr,GRIS,(self.x,self.y,self.w,self.h),1)
         pygame.display.update(r)
 
-#------------------ Affichage de la vitesse instantanee                                             ------------------------------#
-#------ Actions possibles : aucun                                                    -----------------------------------#
+#------------------ Instantaneous speed display                                            ------------------------------#
+#------ Possible actions: none                                           -----------------------------------#
 class speed_widget (rb_widget):
     def __init__(self,layout='1',widget=0):
         rb_widget.__init__(self,layout,widget)
@@ -939,8 +906,8 @@ class speed_widget (rb_widget):
         r = pygame.draw.rect(scr,GRIS,(self.x,self.y,self.w,self.h),1)
         pygame.display.update(r)
 
-#------------------ Affichage du trip1                                          ------------------------------#
-#------ Actions possibles : remise a zero , ajustement +/-100m                  -----------------------------------#
+#------------------ Trip1 display                                          ------------------------------#
+#------ Possible actions: reset, adjustment +/- 100m                  -----------------------------------#
 class trip1_widget (rb_widget):
     def __init__(self,layout='1',widget=0):
         rb_widget.__init__(self,layout,widget)
@@ -1003,8 +970,8 @@ class trip1_widget (rb_widget):
         r = pygame.draw.rect(scr,GRIS,(self.x,self.y,self.w,self.h),1)
         pygame.display.update(r)
 
-#------------------ Affichage de la vitesse moyenne sur le trip1                                             ------------------------------#
-#------ Actions possibles : aucun (il faut faire un RAZ du Trip1 pour remettre a zero)                                                    -----------------------------------#
+#------------------ Display of average speed on trip1                                            ------------------------------#
+#------ Possible actions: none (you must reset Trip1 to reset)                                                   -----------------------------------#
 class vmoy1_widget(rb_widget):
     def __init__(self,layout='1',widget=0):
         rb_widget.__init__(self,layout,widget)
@@ -1026,8 +993,8 @@ class vmoy1_widget(rb_widget):
         r = pygame.draw.rect(scr,GRIS,(self.x,self.y,self.w,self.h),1)
         pygame.display.update(r)
 
-#------------------ Affichage de la vitesse moyenne1                                             ------------------------------#
-#------ Actions possibles : aucun                                                    -----------------------------------#
+#------------------ Average speed display1                                       ------------------------------#
+#------ Possible actions: none                                               -----------------------------------#
 class vmax1_widget(rb_widget):
     def __init__(self,layout='1',widget=0):
         rb_widget.__init__(self,layout,widget)
@@ -1042,8 +1009,8 @@ class vmax1_widget(rb_widget):
         r = pygame.draw.rect(scr,GRIS,(self.x,self.y,self.w,self.h),1)
         pygame.display.update(r)
 
-#------------------ Affichage du chrono1                                            ------------------------------#
-#------ Actions possibles : aucun                                                    -----------------------------------#
+#------------------ Chrono1 display                                          ------------------------------#
+#------ Possible actions: none                                                -----------------------------------#
 class chrono1_widget(rb_widget):
     def __init__(self,layout='1',widget=0):
         rb_widget.__init__(self,layout,widget)
@@ -1213,8 +1180,8 @@ class chrono2_widget(rb_widget):
         r = pygame.draw.rect(scr,GRIS,(self.x,self.y,self.w,self.h),1)
         pygame.display.update(r)
 
-#------------------ Affichage du compte a rebours                                            ------------------------------#
-#------ Actions possibles : ajout de 30 secondes, RAZ, demarrage du compte a rebours                                                    -----------------------------------#
+#------------------ Countdown display  ------------------------------#
+#------ Possible actions: adding 30 seconds, resetting, starting the countdown   ----------------#
 class countdown_widget (rb_widget):
     def __init__(self,layout='1',widget=0):
         global decompte
@@ -1312,7 +1279,7 @@ class heure_widget(rb_widget):
         pygame.display.update(r)
 
 #----------------------------------------------------------------------------------------------#
-#-------------------------- Vérification configfiles ------------------------------------------#
+#-------------------------- Configfiles verification ------------------------------------------#
 #----------------------------------------------------------------------------------------------#
 guiconfig = configparser.ConfigParser()
 rbconfig = configparser.ConfigParser()
@@ -1399,10 +1366,10 @@ def check_configfile():
     global widgets,nb_widgets,ncases,current_screen,mode_jour,default_widget,current_widget
     global chrono_decompte,start_decompte,en,_
     global boutonsTrip,boutonsRB
-    # On charge les emplacements des elements d'affichage
+    # We load the locations of the display elements
     guiconfig.read('/home/rpi/RpiRoadbook/gui.cfg')
 
-    # On charge les reglages : developpe, nb aimants, orientation
+    # We load the settings: developed, number of magnets, orientation
     candidates = ['/home/rpi/RpiRoadbook/setup.cfg','/mnt/piusb/.conf/RpiRoadbook_setup.cfg']
     setupconfig.read(candidates)
     save_setupconfig()
@@ -1414,30 +1381,30 @@ def check_configfile():
     boutonsRB = setupconfig['Parametres']['boutonsRB']
     langue = setupconfig['Parametres']['langue']
 
-    if langue == 'FR' :
-        fr.install()
-        _ = fr.gettext # Francais
-    elif langue == 'EN' :
-        en.install()
-        _ = en.gettext # Francais
-    elif langue == 'IT' :
-        it.install()
-        _ = it.gettext # Italiano
-    elif langue == 'DE' :
-        de.install()
-        _ = de.gettext
-    elif langue == 'ES' :
-        es.install
-        _ = es.gettext
+    if langue == 'EN' :
+           en.install()
+        _ = en.gettext # English
+    # elif langue == 'FR' :
+    #      fr.install()
+    #     _ = fr.gettext # French
+    # elif langue == 'IT' :
+    #     it.install()
+    #     _ = it.gettext # Italian
+    # elif langue == 'DE' :
+    #     de.install()
+    #     _ = de.gettext # German
+    # elif langue == 'ES' :
+    #     es.install
+    #     _ = es.gettext # Spanish
 
-    # On charge le mode en cours, l'ecran en cours, le roadbook en cours et sa case
+    # We load the current mode, the current screen, the current roadbook and its box
     candidates = ['/home/rpi/RpiRoadbook/RpiRoadbook.cfg','/mnt/piusb/.conf/RpiRoadbook.cfg']
     rbconfig.read(candidates)
     save_rbconfig()
     rallye = rbconfig['Mode']['mode']
     current_screen = int(rbconfig['Ecran']['ecran'])
 
-    # On charge le trip
+    # We load the trip
     candidates = ['/home/rpi/RpiRoadbook/odo.cfg','/mnt/piusb/.log/odo.cfg']
     odoconfig.read(candidates)
     save_odoconfig()
@@ -1446,7 +1413,7 @@ def check_configfile():
     distance1 = float(odoconfig['Odometre']['Distance1'])
     distance2 = float(odoconfig['Odometre']['Distance2'])
 
-    # On charge le chrono pour la vitesse moyenne
+    # We load the stopwatch for the average speed
     candidates = ['/home/rpi/RpiRoadbook/chrono.cfg','/mnt/piusb/.log/chrono.cfg']
     chronoconfig.read(candidates)
     save_chronoconfig()
@@ -1459,7 +1426,7 @@ def check_configfile():
     start_decompte = chronoconfig['Decompte']['start_decompte'] == 'True'
     chrono_decompte = float(chronoconfig['Decompte']['chrono_decompte'])
 
-    # On charge les configuration d'ecran selon le mode
+    # We load the screen configuration according to the mode
     if rallye == 'Route' :
         candidates = ['/home/rpi/RpiRoadbook/route.cfg','/mnt/piusb/.conf/route.cfg']
     else:
@@ -1495,7 +1462,7 @@ def check_configfile():
 
 
 #*******************************************************************************************************#
-#---------------------------------------- Le template de classe / écran  -------------------------------#
+#---------------------------------------- The class / screen template  -------------------------------#
 #*******************************************************************************************************#
 class SceneBase:
     def __init__(self, fname = ''):
@@ -1520,7 +1487,7 @@ class SceneBase:
         self.SwitchToScene(None)
 
 #*******************************************************************************************************#
-#--------------------------------------- La boucle principale de l'appli -------------------------------#
+#--------------------------------------- The main app loop -------------------------------#
 #*******************************************************************************************************#
 def run_RpiRoadbook(width, height,  starting_scene):
     global fps
@@ -1541,7 +1508,7 @@ def run_RpiRoadbook(width, height,  starting_scene):
 
     while active_scene != None:
         pressed_keys = pygame.key.get_pressed()
-        # On ne checke la température et la charge cpu que toutes les 5 secondes
+        # We only check the temperature and the cpu load every 5 seconds
         if time.time() - 5 > t_sys :
             rpi_temp()
             cpu_load()
@@ -1577,7 +1544,7 @@ def run_RpiRoadbook(width, height,  starting_scene):
     GPIO.cleanup()
 
 #*******************************************************************************************************#
-#---------------------------------------- Ecran Titre du Roadbook --------------------------------------#
+#---------------------------------------- Roadbook Title Screen --------------------------------------#
 #*******************************************************************************************************#
 
 class TitleScene(SceneBase):
@@ -1609,7 +1576,7 @@ class TitleScene(SceneBase):
 
 
 #*******************************************************************************************************#
-#---------------------------------------- Ecran de sélection du Roadbook -------------------------------#
+#---------------------------------------- Roadbook selection screen -------------------------------#
 #*******************************************************************************************************#
 class SelectionScene(SceneBase):
     def __init__(self):
@@ -1766,7 +1733,7 @@ class SelectionScene(SceneBase):
         update_sprites(screen)
 
 #*******************************************************************************************************#
-#---------------------------------------- La partie Pas de Roadbooks présents --------------------------#
+#---------------------------------------- The No Roadbooks present section --------------------------#
 #*******************************************************************************************************#
 class NoneScene(SceneBase):
     def __init__(self, fname = ''):
@@ -1811,7 +1778,7 @@ class NoneScene(SceneBase):
 
 
 #*******************************************************************************************************#
-#---------------------------------------- La partie Maintenance ----------------------------------------#
+#---------------------------------------- The Maintenance part ----------------------------------------#
 #*******************************************************************************************************#
 class ConfigScene(SceneBase):
     def __init__(self, fname = ''):
@@ -1950,7 +1917,7 @@ class ConfigScene(SceneBase):
 
 
 #*******************************************************************************************************#
-#------------------------- La partie Dérouleur ---------------------------------------------------------#
+#------------------------- The Unwinder part ---------------------------------------------------------#
 #*******************************************************************************************************#
 class RoadbookScene(SceneBase):
     def __init__(self, fname = ''):
@@ -2082,9 +2049,9 @@ class RoadbookScene(SceneBase):
         global widgets,force_refresh,widget_select_t,current_widget,widget_isselected,default_widget,widget_iscountdown
         global speed,vmax1,vmax2,save_t_moy,old_totalisateur
 
-        # MAJ des cases du rb
+        # Update of the rb boxes
         if (self.case != self.oldcase) or force_refresh :
-            # On sauvegarde la nouvelle position
+            # We save the new position
             rbconfig['Roadbooks']['case'] = str(self.case)
             save_rbconfig()
             if angle == 0 :
@@ -2108,7 +2075,7 @@ class RoadbookScene(SceneBase):
                 widget_isselected = False
                 current_widget = default_widget
 
-        # MAJ des infos des widgets
+        # Update widget info
         save_t = time.time()
         if ( save_t - save_t_moy >= 1) : # Vitesse moyenne sur 1 seconde
             speed = (totalisateur-old_totalisateur)*3.6/(save_t-save_t_moy)/1000;
@@ -2214,9 +2181,9 @@ class OdometerScene(SceneBase):
         global widgets
         global speed,vmax1,vmax2,save_t_moy,old_totalisateur
 
-        # MAJ des infos des widgets
+        # Update widget info
         save_t = time.time()
-        if ( save_t - save_t_moy >= 1) : # Vitesse moyenne sur 1 seconde
+        if ( save_t - save_t_moy >= 1) : # Average speed over 1 second
             speed = (totalisateur-old_totalisateur)*3.6/(save_t-save_t_moy)/1000;
             save_t_moy = save_t
             old_totalisateur = totalisateur
@@ -2227,9 +2194,9 @@ class OdometerScene(SceneBase):
         for j in list(widgets.keys()):
             widgets[j].update()
 
-        # Sauvegarde de l'odometre, distances et temps de depart de chrono toutes les 5 secondes
+        # Saving of the odometer, distances and start times of the chrono every 5 seconds
         k = time.time()
-        if k - save_t_odo >= 5 : # On sauvegarde l'odometre toutes les 5 secondes
+        if k - save_t_odo >= 5 : # We save the odometer every 5 seconds
             odoconfig['Odometre']['Totalisateur'] = str(totalisateur)
             odoconfig['Odometre']['Distance1'] = str(distance1)
             odoconfig['Odometre']['Distance2'] = str(distance2)
@@ -2245,12 +2212,12 @@ class OdometerScene(SceneBase):
 
     def Render(self, screen):
         global widgets
-        # Positionnement des différents éléments d'affichage, s'ils ont été modifiés
+        # Positioning of the different display elements, if they have been modified
         for j in list(widgets.keys()):
             widgets[j].render(screen)
 
 #*******************************************************************************************************#
-#------------------------- La partie Derouleur Zoom   --------------------------------------------------#
+#------------------------- The Unwinder section Zoom   --------------------------------------------------#
 #*******************************************************************************************************#
 class RoadbookZoomScene(SceneBase):
     def __init__(self, fname = ''):
@@ -2281,7 +2248,7 @@ class RoadbookZoomScene(SceneBase):
         aimants = int(setupconfig['Parametres']['aimants'])
         developpe = 1.0*roue / aimants
 
-        #Chargement des images
+        # Loading images
         fichiers = sorted([name for name in os.listdir('/mnt/piusb/Conversions/'+filedir) if os.path.isfile(os.path.join('/mnt/piusb/Conversions/'+filedir, name))])
         self.nb_cases = len(fichiers)
         self.case = int(rbconfig['Roadbooks']['case'])
@@ -2292,7 +2259,7 @@ class RoadbookZoomScene(SceneBase):
         samplepage = pygame.image.load (os.path.join('/mnt/piusb/Conversions/'+filedir,fichiers[0]))
         (w,h) = samplepage.get_rect().size
         rb_ratio = 480/w if self.orientation == 'Portrait' else min(800/w,240/h)
-        # Mise à l'échelle des images
+        # Image scaling
         self.nh = h * rb_ratio
 
         if mode_jour :
@@ -2365,9 +2332,9 @@ class RoadbookZoomScene(SceneBase):
         global widgets,force_refresh,widget_select_t,current_widget,widget_isselected,default_widget,widget_iscountdown
         global speed,vmax1,vmax2,save_t_moy,old_totalisateur
 
-        # MAJ des cases du rb
+        # Update of rb boxes
         if (self.case != self.oldcase) or force_refresh :
-            # On sauvegarde la nouvelle position
+            # We save the new position
             rbconfig['Roadbooks']['case'] = str(self.case)
             save_rbconfig()
             if angle == 0 :
@@ -2390,9 +2357,9 @@ class RoadbookZoomScene(SceneBase):
             self.oldcase = self.case
         widgets[(0)].update()
 
-        # MAJ des infos des widgets
+        # Update widget info
         save_t = time.time()
-        if ( save_t - save_t_moy >= 1) : # Vitesse moyenne sur 1 seconde
+        if ( save_t - save_t_moy >= 1) : # Average speed over 1 second
             speed = (totalisateur-old_totalisateur)*3.6/(save_t-save_t_moy)/1000;
             save_t_moy = save_t
             old_totalisateur = totalisateur
@@ -2401,7 +2368,7 @@ class RoadbookZoomScene(SceneBase):
         if speed > vmax2 :
             vmax2 = speed
 
-        # Sauvegarde de l'odometre, distances et temps de depart de chrono toutes les 5 secondes
+        # Saving of the odometer, distances and start times of the chrono every 5 seconds
         k = time.time()
         if k - save_t_odo >= 5 : # On sauvegarde l'odometre toutes les 5 secondes
             odoconfig['Odometre']['Totalisateur'] = str(totalisateur)
@@ -2424,7 +2391,7 @@ class RoadbookZoomScene(SceneBase):
         widgets[(0)].render(screen)
 
 #*******************************************************************************************************#
-#------------------------- Definition des routes Flask   -----------------------------------------------#
+#------------------------- Definition of Flask routing  -----------------------------------------------#
 #*******************************************************************************************************#
 #@app.route('/')
 #def index():
