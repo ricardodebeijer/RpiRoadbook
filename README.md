@@ -43,7 +43,7 @@ _Use a Linux system, because `make` in combination with Buildroot does not work 
 - Extract again with: `tar xf buildroot-2019.02.tar.bz2`
 - Create `.config` again with: `make raspberrypi3_defconfig`
 - This time overwrite the `.config` created, with the config provided in `/board/rpi-3/buildroot-2019.02-system-01.config`
-- No run `make` inside of the `buildroot` folder, again this take a while, but this time only a few minutes.
+- Now run `make` inside of the `buildroot` folder, again this take a while, but this time only a few minutes.
 - List all your current disks with `lsblk`, now plug your SD card in and run `lsblk` again, notice which disk is added (in my case `sdb`)
 - Unmount all partitions of that disk with `umount /dev/sdb?`
 - Finally install the generated image on the SD card with: `sudo cp output/images/sdcard.img /dev/sdb`
