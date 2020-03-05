@@ -1,3 +1,4 @@
 pygame
 image
 RPi.GPIO
+configparser

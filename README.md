@@ -26,6 +26,11 @@ Switching to on-board vehicles meets different needs: quick start-up and securit
 - Change directory into the `RpiRoadbook` src folder
 - run `pip install -r requirements.txt`
 
+## Dependencies
+
+* `libsdl1.2-dev`
+* `python-pygame`
+
 
 ## Buildroot and Raspberry Pi
 _Use a Linux system, because `make` in combination with Buildroot does not work on Windows as far as I tested_
