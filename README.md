@@ -59,8 +59,16 @@ _Use a Linux system, because `make` in combination with Buildroot does not work 
 - Copy new image to SD card again `sudo cp output/images/sdcard.img /dev/sdb`
 
 
+# testing out normal raspberry pi config
+- using `make raspberrypi3_defconfig` with no changes to the config
+- and doing `make` (takes a while)
+- when its done `sudo dd if=output/images/sdcard.img of=/dev/sdX`, where `sdX` is `sdb` in my case
+
+
 ## Python application / PDF reader / Trip
-To come up...
+In order to get the Python application of /RpiRoadbook on the raspberry pi (and boot by default) we need to do some extra steps.python -m pip install --upgrade pip setuptools whe
+...
+
 
 ## Remote control
 To come up...
