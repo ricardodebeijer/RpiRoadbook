@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 
 # To hide the message of the pygame version
-#import contextlib
-#with contextlib.redirect_stdout(None):
-import pygame.display
+import contextlib
+with contextlib.redirect_stdout(None):
+    import pygame
 
 # For display on the framebuffer
 from pygame.locals import *
@@ -16,11 +16,11 @@ import re
 import math
 # import serial
 # For reading pdf files and converting to image
-from pdf2image import page_count,convert_from_path,page_size
+# from pdf2image import page_count,convert_from_path,page_size
 import subprocess
 
 # TODO: When on Pi, should use GPIO
-# import RPi.GPIO as GPIO
+import gpio as GPIO
 
 # For touchscreen management
 import sys
@@ -88,16 +88,16 @@ boutonsTrip = 1
 boutonsRB = 1
 
 CAPTEUR_ROUE    = USEREVENT # Odometer
-BOUTON_LEFT     = pygame.K_LEFT # Left button (at the very top)
-BOUTON_HOME     = pygame.K_HOME # Left long button
-BOUTON_RIGHT    = pygame.K_RIGHT # Right button (2nd above)
-BOUTON_END      = pygame.K_END # Right long button
-BOUTON_OK       = pygame.K_RETURN # OK / select button (middle)
-BOUTON_BACKSPACE = pygame.K_BACKSPACE # OK button long
-BOUTON_UP       = pygame.K_UP # Up button (1st down)
-BOUTON_PGUP     = pygame.K_PAGEUP # Long UP button
-BOUTON_DOWN     = pygame.K_DOWN # Down button (bottom)
-BOUTON_PGDOWN  = pygame.K_PAGEDOWN # Long Down button
+BOUTON_LEFT     = pygame.constants.K_LEFT # Left button (at the very top)
+BOUTON_HOME     = pygame.constants.K_HOME # Left long button
+BOUTON_RIGHT    = pygame.constants.K_RIGHT # Right button (2nd above)
+BOUTON_END      = pygame.constants.K_END # Right long button
+BOUTON_OK       = pygame.constants.K_RETURN # OK / select button (middle)
+BOUTON_BACKSPACE = pygame.constants.K_BACKSPACE # OK button long
+BOUTON_UP       = pygame.constants.K_UP # Up button (1st down)
+BOUTON_PGUP     = pygame.constants.K_PAGEUP # Long UP button
+BOUTON_DOWN     = pygame.constants.K_DOWN # Down button (bottom)
+BOUTON_PGDOWN  = pygame.constants.K_PAGEDOWN # Long Down button
 
 GPIO_ROUE = 17
 GPIO_LEFT = 27
@@ -120,7 +120,7 @@ en = gettext.translation('rpiroadbook', localedir='locales', languages=['en'])
 
 # On charge les reglages des boutons
 setupconfig = configparser.ConfigParser()
-candidates = ['/home/rpi/RpiRoadbook/setup.cfg','/mnt/piusb/.conf/RpiRoadbook_setup.cfg']
+candidates = ['setup.cfg','RpiRoadbook_setup.cfg']
 setupconfig.read(candidates)
 boutonsTrip = setupconfig['Parametres']['boutonsTrip']
 boutonsRB = setupconfig['Parametres']['boutonsRB']
@@ -129,7 +129,7 @@ boutonsPull = 'Up'
 
 # Logfile for debugging
 def logdebug (st) :
-    with open('/mnt/piusb/thumbnail/debug.log','a') as f:
+    with open('debug.log','a') as f:
         f.write('{}\n'.format(st))
 
 # Function which returns the state of the button, if the montage is in pull-up
@@ -402,7 +402,7 @@ def get_image(key,angle=0,mode_jour=True):
     global filedir,fichiers,image_cache
     # Loading images only if not yet cached
     if not (key,angle,mode_jour) in image_cache:
-        img = pygame.image.load(os.path.join('/mnt/piusb/Conversions/'+filedir,fichiers[key]))
+        img = pygame.image.load(os.path.join(''+filedir,fichiers[key]))
         if mode_jour:
             s = img
         else :
@@ -412,8 +412,8 @@ def get_image(key,angle=0,mode_jour=True):
         f = fichiers[key]
         a = f.replace(filedir,'annotation')
         a = a.replace('jpg','png')
-        if os.path.isfile('/mnt/piusb/Annotations/{}/{}'.format(filedir,a)) :
-            annot = pygame.image.load('/mnt/piusb/Annotations/{}/{}'.format(filedir,a))
+        if os.path.isfile('{}/{}'.format(filedir,a)) :
+            annot = pygame.image.load('{}/{}'.format(filedir,a))
             #annot.set_colorkey(NOIR)
             s.blit(annot,(0,0))
         image_cache[(key,angle)] = pygame.transform.rotozoom (s,angle,rb_ratio)
@@ -805,7 +805,7 @@ class status_widget (rb_widget):
         global widgets,current_screen,screenconfig,nb_widgets,ncases,sprites,old_sprites,mode_jour,force_refresh,rbconfig,default_widget
 
         # We load the current mode, the current roadbook and its box
-        candidates = ['/home/rpi/RpiRoadbook/RpiRoadbook.cfg','/mnt/piusb/.conf/RpiRoadbook.cfg']
+        candidates = ['RpiRoadbook.cfg','RpiRoadbook.cfg']
         rbconfig.read(candidates)
         rallye = rbconfig['Mode']['mode']
 
@@ -1292,7 +1292,7 @@ def save_setupconfig():
     global setupconfig
     for attempt in range(5):
         try :
-            with open('/mnt/piusb/.conf/RpiRoadbook_setup.cfg', 'w') as configfile:
+            with open('RpiRoadbook_setup.cfg', 'w') as configfile:
                 setupconfig.write(configfile)
         except :
             subprocess.Popen('sudo mount -a',shell=True)
@@ -1306,7 +1306,7 @@ def save_rbconfig():
     global rbconfig
     for attempt in range(5):
         try :
-            with open('/mnt/piusb/.conf/RpiRoadbook.cfg', 'w') as configfile:
+            with open('RpiRoadbook.cfg', 'w') as configfile:
                 rbconfig.write(configfile)
         except :
             subprocess.Popen('sudo mount -a',shell=True)
@@ -1320,7 +1320,7 @@ def save_odoconfig():
     global odoconfig
     for attempt in range (5):
         try:
-            with open('/mnt/piusb/.log/odo.cfg','w') as configfile:
+            with open('odo.cfg','w') as configfile:
                 odoconfig.write(configfile)
         except:
             subprocess.Popen('sudo mount -a',shell=True)
@@ -1334,7 +1334,7 @@ def save_chronoconfig():
     global chronoconfig
     for attempt in range (5):
         try:
-            with open('/mnt/piusb/.log/chrono.cfg','w') as configfile:
+            with open('chrono.cfg','w') as configfile:
                 chronoconfig.write(configfile)
         except:
             subprocess.Popen('sudo mount -a',shell=True)
@@ -1346,7 +1346,7 @@ def save_chronoconfig():
 
 def save_screenconfig(mode='Route'):
     global screenconfig
-    f = '/mnt/piusb/.conf/route.cfg' if mode == 'Route' else '/mnt/piusb/.conf/screen.cfg'
+    f = 'route.cfg' if mode == 'Route' else 'screen.cfg'
     for attempt in range (5):
         try:
             with open(f,'w') as configfile:
@@ -1367,10 +1367,10 @@ def check_configfile():
     global chrono_decompte,start_decompte,en,_
     global boutonsTrip,boutonsRB
     # We load the locations of the display elements
-    guiconfig.read('/home/rpi/RpiRoadbook/gui.cfg')
+    guiconfig.read('gui.cfg')
 
     # We load the settings: developed, number of magnets, orientation
-    candidates = ['/home/rpi/RpiRoadbook/setup.cfg','/mnt/piusb/.conf/RpiRoadbook_setup.cfg']
+    candidates = ['setup.cfg','RpiRoadbook_setup.cfg']
     setupconfig.read(candidates)
     save_setupconfig()
     aimants = setupconfig['Parametres']['aimants']
@@ -1381,9 +1381,9 @@ def check_configfile():
     boutonsRB = setupconfig['Parametres']['boutonsRB']
     langue = setupconfig['Parametres']['langue']
 
-    if langue == 'EN' :
-           en.install()
-        _ = en.gettext # English
+    # if langue == 'EN' :
+    #        en.install()
+    #     _ = en.gettext
     # elif langue == 'FR' :
     #      fr.install()
     #     _ = fr.gettext # French
@@ -1398,14 +1398,14 @@ def check_configfile():
     #     _ = es.gettext # Spanish
 
     # We load the current mode, the current screen, the current roadbook and its box
-    candidates = ['/home/rpi/RpiRoadbook/RpiRoadbook.cfg','/mnt/piusb/.conf/RpiRoadbook.cfg']
+    candidates = ['RpiRoadbook.cfg','RpiRoadbook.cfg']
     rbconfig.read(candidates)
     save_rbconfig()
     rallye = rbconfig['Mode']['mode']
     current_screen = int(rbconfig['Ecran']['ecran'])
 
     # We load the trip
-    candidates = ['/home/rpi/RpiRoadbook/odo.cfg','/mnt/piusb/.log/odo.cfg']
+    candidates = ['odo.cfg','odo.cfg']
     odoconfig.read(candidates)
     save_odoconfig()
     totalisateur = float(odoconfig['Odometre']['Totalisateur'])
@@ -1414,7 +1414,7 @@ def check_configfile():
     distance2 = float(odoconfig['Odometre']['Distance2'])
 
     # We load the stopwatch for the average speed
-    candidates = ['/home/rpi/RpiRoadbook/chrono.cfg','/mnt/piusb/.log/chrono.cfg']
+    candidates = ['chrono.cfg','chrono.cfg']
     chronoconfig.read(candidates)
     save_chronoconfig()
     chrono_delay1 = int (chronoconfig['Chronometre1']['chrono_delay'])
@@ -1428,9 +1428,9 @@ def check_configfile():
 
     # We load the screen configuration according to the mode
     if rallye == 'Route' :
-        candidates = ['/home/rpi/RpiRoadbook/route.cfg','/mnt/piusb/.conf/route.cfg']
+        candidates = ['route.cfg','route.cfg']
     else:
-        candidates = ['/home/rpi/RpiRoadbook/screen.cfg','/mnt/piusb/.conf/screen.cfg']
+        candidates = ['screen.cfg','screen.cfg']
     screenconfig.read(candidates)
     save_screenconfig(rallye)
     mode_jour = screenconfig['Affichage{}'.format(current_screen)]['jour_nuit'] == 'Jour'
@@ -1627,7 +1627,7 @@ class SelectionScene(SceneBase):
         self.selection= 0 ;
         self.fenetre = 0 ;
         self.saved = rbconfig['Roadbooks']['etape'] ;
-        self.filenames = [f for f in os.listdir('/mnt/piusb/') if re.search('.pdf$', f)]
+        self.filenames = [f for f in os.listdir('/') if re.search('.pdf$', f)]
         if len(self.filenames) == 0 : self.SwitchToScene(NoneScene())
         if self.saved in self.filenames : # le fichier rb existe, on le préselectionne
             self.filename = self.saved
@@ -1665,12 +1665,12 @@ class SelectionScene(SceneBase):
                     self.iscountdown = False
                 elif event.key == BOUTON_OK :
                         self.iscountdown = False ;
-                        if self.filename != self.filenames[self.selection] : # we have selected a new rb, we will position ourselves at the start
-                            self.filename = self.filenames[self.selection]
-                            rbconfig['Roadbooks']['etape'] = self.filenames[self.selection]
-                            rbconfig['Roadbooks']['case'] = '0'
-                            save_rbconfig()
-                        self.k = self.j + self.countdown + 1 # hack to display the message loading
+                        # if self.filename != self.filenames[self.selection] : # we have selected a new rb, we will position ourselves at the start
+                        #     self.filename = self.filenames[self.selection]
+                        #     rbconfig['Roadbooks']['etape'] = self.filenames[self.selection]
+                        #     rbconfig['Roadbooks']['case'] = '0'
+                        #     save_rbconfig()
+                        # self.k = self.j + self.countdown + 1 # hack to display the message loading
                         if self.rallye == 'Zoom' :
                             self.SwitchToScene(RoadbookZoomScene(self.filename))
                         else :
@@ -1764,10 +1764,14 @@ class NoneScene(SceneBase):
             if event.type == pygame.QUIT:
                 self.Terminate()
             elif event.type == pygame.KEYDOWN :
-                if event.key == BOUTON_LEFT or event.key == BOUTON_RIGHT or event.key == BOUTON_OK or event.key == BOUTON_UP or event.key == BOUTON_DOWN :
-                    setupconfig['Parametres']['mode'] = 'Route'
-                    save_setupconfig()
-                    self.SwitchToScene(TitleScene())
+                if event.key == BOUTON_LEFT:
+                    self.SwitchToScene(ConfigScene())
+                if event.key == BOUTON_RIGHT:
+                    self.SwitchToScene(OdometerScene())
+                # if event.key == BOUTON_UP: 
+                #     self.SwitchToScene(RoadbookScene())
+                # if event.key == BOUTON_DOWN :
+                #     self.SwitchToScene(RoadbookZoomScene())
 
     def Update(self):
         pass
@@ -1886,7 +1890,7 @@ class ConfigScene(SceneBase):
 
                         for fileitem in filelist:
                             try:
-                                os.remove("/mnt/piusb/{}".format(fileitem))
+                                os.remove("{}".format(fileitem))
                             except :
                                 print('error deleting {}'.format(fileitem))
                         self.index = 2
@@ -1956,14 +1960,14 @@ class RoadbookScene(SceneBase):
         old_distance1 = distance1
 
         #Loading images
-        fichiers = sorted([name for name in os.listdir('/mnt/piusb/Conversions/'+filedir) if os.path.isfile(os.path.join('/mnt/piusb/Conversions/'+filedir, name))])
+        fichiers = sorted([name for name in os.listdir(''+filedir) if os.path.isfile(os.path.join(''+filedir, name))])
         self.nb_cases = len(fichiers)
         self.case = int(rbconfig['Roadbooks']['case'])
         if self.case < 0 :
             self.case = 0 # on compte de 0 à longueur-1
         self.oldcase = self.case + 1
 
-        samplepage = pygame.image.load (os.path.join('/mnt/piusb/Conversions/'+filedir,fichiers[0]))
+        samplepage = pygame.image.load (os.path.join(''+filedir,fichiers[0]))
         (w,h) = samplepage.get_rect().size
         rb_ratio = min(480/w,150/h) if self.orientation == 'Portrait' else min(500/w,160/h)
         # Image scaling
@@ -2249,14 +2253,14 @@ class RoadbookZoomScene(SceneBase):
         developpe = 1.0*roue / aimants
 
         # Loading images
-        fichiers = sorted([name for name in os.listdir('/mnt/piusb/Conversions/'+filedir) if os.path.isfile(os.path.join('/mnt/piusb/Conversions/'+filedir, name))])
+        fichiers = sorted([name for name in os.listdir(''+filedir) if os.path.isfile(os.path.join(''+filedir, name))])
         self.nb_cases = len(fichiers)
         self.case = int(rbconfig['Roadbooks']['case'])
         if self.case < 0 :
             self.case = 0 # on compte de 0 à longueur-1
         self.oldcase = self.case + 1
 
-        samplepage = pygame.image.load (os.path.join('/mnt/piusb/Conversions/'+filedir,fichiers[0]))
+        samplepage = pygame.image.load (os.path.join(''+filedir,fichiers[0]))
         (w,h) = samplepage.get_rect().size
         rb_ratio = 480/w if self.orientation == 'Portrait' else min(800/w,240/h)
         # Image scaling
