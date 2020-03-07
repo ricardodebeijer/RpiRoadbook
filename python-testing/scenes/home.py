@@ -1,10 +1,14 @@
+import contextlib
+
 import scenes
 from scenes.base import BaseScene
-import pygame
+
+with contextlib.redirect_stdout(None):
+    import pygame
 
 # Home scene
 class HomeScene(BaseScene):
-    def __init__(self, fname = ''):
+    def __init__(self, fname=''):
         BaseScene.__init__(self)
         self.next = self
         self.filename = fname

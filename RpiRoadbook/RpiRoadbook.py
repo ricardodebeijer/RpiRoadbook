@@ -22,7 +22,7 @@ import subprocess
 # TODO: When on Pi, should use GPIO
 # import RPi.GPIO as GPIO
 
-# Pour la gestion du touchscreen
+# For touchscreen management
 import sys
 if os.path.isdir ("/dev/input/event0") :
     os.environ["SDL_FBDEV"] = "/dev/fb0"
@@ -32,7 +32,7 @@ if os.path.isdir ("/dev/input/event0") :
 else:
     is_tactile = False
 
-# Pour l'internationalisation
+# For internationalization
 import gettext
 _ = gettext.gettext
 
@@ -46,7 +46,7 @@ old_totalisateur = 0
 distance1 = 0
 vmoy1 = 0
 vmax1 = 0
-#chrono_delay1 = 5 * aimants # 5 tours de roue avant de declencher le chrono
+#chrono_delay1 = 5 * aimants # 5 turns of the wheel before triggering the stop
 chrono_delay1 = 5
 chrono_time1 = 0
 old_distance1 = 0
@@ -54,7 +54,7 @@ old_distance1 = 0
 distance2 = 0
 vmoy2 = 0
 vmax2 = 0
-#chrono_delay2 = 5 * aimants # 5 tours de roue avant de declencher le chrono
+#chrono_delay2 = 5 * aimants # 5 turns of the wheel before triggering the stopo
 chrono_delay2 = 5
 chrono_time2 = 0
 old_distance2 = 0

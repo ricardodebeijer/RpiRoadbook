@@ -1,6 +1,6 @@
 # The template used for other scenes/screens to extend from
 class BaseScene:
-    def __init__(self, fname = ''):
+    def __init__(self, fname=''):
         self.next = self
         self.filename = fname
 
