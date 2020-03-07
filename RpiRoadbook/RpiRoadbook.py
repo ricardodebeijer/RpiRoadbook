@@ -425,7 +425,7 @@ def get_image(key,angle=0,mode_jour=True):
 #-------------------------------------------------------------------------------------------#
 
 mode_jour = True
-# Definition des couleurs
+# Definition of colors
 BLANC = (255,255,255)
 NOIR = (0,0,0)
 ROUGE = (255,0,0)
@@ -434,7 +434,7 @@ BLEU = (0,0,255)
 GRIS = (125,125,125)
 JAUNE = (200,200,50,100)
 
-#Styles utilises :
+# Styles used
 BLANC25     = 0
 BLANC50     = 1
 BLANC75     = 2
@@ -462,7 +462,7 @@ BLANC20inv  =23
 BLANC3inv   =24
 BLANC4inv   =25
 BLANC5inv   =26
-#Taille des polices pour chaque style
+# Font size for each style
 SALPHA = {BLANC25:25,BLANC50:50,BLANC75:75,BLANC100:100,BLANC200:200,BLANC25inv:25,BLANC50inv:50,ROUGE25:25,ROUGE25inv:25,VERT25:25,GRIS75:75,BLANC80:80,BLANC20:20,BLANC20inv:20,ROUGE20:20,BLANC3:90,BLANC3inv:90,BLANC4:59,BLANC4inv:59,BLANC5:45,BLANC5inv:45,ROUGE3:90,ROUGE4:59,ROUGE5:45,VERT3:90,VERT4:59,VERT5:45}
 
 alphabet = {}
@@ -472,7 +472,7 @@ alphabet_size_y = {}
 myfont = {}
 def load_font(police=BLANC25) :
     global myfont
-    # Chargement d'une font si pas encore en cache
+    # Loading a font if not yet cached
     if not police in myfont :
         if police in SALPHA:
             myfont[police]  = pygame.font.SysFont("cantarell", SALPHA[police])
@@ -566,7 +566,7 @@ def update_sprites(screen):
             force_refresh = False
 
 #--------------------------------------------------------------------------------- ----------#
-#------------------------------ Organisation des widgets ------------------------------------#
+#------------------------------ Widget organization ------------------------------------#
 #---------------------------------------------------------------------------------- ---------#
 current_screen = 1
 current_widget = 0
@@ -578,7 +578,7 @@ widget_iscountdown = False
 widget_select_t = 0
 default_widget = 7
 
-#------------------------------ Definition des widgets ---------------------------------------------#
+#------------------------------ Definition of widgets ---------------------------------------------#
 widget_presets = {
     'pajra1' : {'orientation':'Paysage','jour_nuit':'Jour','mode':'Rallye','layout':'1'},
     'pajra2' : {'orientation':'Paysage','jour_nuit':'Jour','mode':'Rallye','layout':'2'},
@@ -609,22 +609,22 @@ widget_presets = {
 }
 
 widget_sizes = {
-    # Nb de champs pour les formats rallye paysage
+    # Number of fields for landscape rally formats
     '1' : 3,
     '2' : 4,
     '3' : 5,
     '4' : 6,
-    # Nb de champs pour les formats rallye portrait
+    # Number of fields for portrait rally formats
     '5' : 2,
     '6' : 3,
     '7' : 4,
     '8' : 1,
     '9' : 2,
     '10': 3,
-    # Nb de champs pour les compteurs simples paysage et portrait
+    # Number of fields for landscape and portrait single meters
     '11': 5,
     '12': 5,
-    # Pour le zoom
+    # For the zoom
     '0' : 0,
     '00': 0
     }
@@ -1219,8 +1219,8 @@ class countdown_widget (rb_widget):
         global angle
         if start_decompte:
             t = chrono_decompte - time.time()
-            # lorsqu'on a x minutes, on peut pointer entre x et x+29secondes
-            # Il reste moins de 10s, on va bientot pouvoir pointer
+            # when you have x minutes, you can point between x and x + 29 seconds
+            # There are less than 10s, we will soon be able to point
             if t <= 10 :
                 m,s = divmod(t,60)
                 ts = math.floor(s*5)
@@ -1228,10 +1228,10 @@ class countdown_widget (rb_widget):
                     self.value_font = self.inside_font
                 else:
                     self.value_font = self.originfont
-            # Tout va bien, on devrait pointer en ce moment
+            # All is well, we should point right now
             if t >-20 and t <= 0 :
                 self.value_font = self.inside_font
-            # entre x+20 secondes et x+29, il faudrait se depecher de pointer
+            # between x + 20 seconds and x + 29, you should hurry to point
             if t <= -20 and t > -30 :
                 m,s = divmod (t,60)
                 ts = math.floor(s*5)
@@ -1239,7 +1239,7 @@ class countdown_widget (rb_widget):
                     self.value_font = self.over_font
                 else :
                     self.value_font = self.inside_font
-            # on est en retard
+            # We are late
             if t < -30 :
                 self.value_font =  self.over_font
                 #self.unit_font = self.label_font
@@ -1600,7 +1600,7 @@ class SelectionScene(SceneBase):
         sprites = {}
         old_sprites = {}
 
-        # On ne charge que les polices dont on a besoin
+        # We only load the fonts we need
         setup_alphabet(BLANC25)
         setup_alphabet(BLANC25inv)
         setup_alphabet(ROUGE25)
@@ -1632,7 +1632,7 @@ class SelectionScene(SceneBase):
         if self.saved in self.filenames : # le fichier rb existe, on le préselectionne
             self.filename = self.saved
             self.selection = self.filenames.index(self.filename)
-        else : # le fichier rb n'existe plus
+        else : # the rb file no longer exists
             self.filename = ''
 
         if mode_jour :
@@ -1665,12 +1665,12 @@ class SelectionScene(SceneBase):
                     self.iscountdown = False
                 elif event.key == BOUTON_OK :
                         self.iscountdown = False ;
-                        if self.filename != self.filenames[self.selection] : # on a sélectionné un nouveau rb, on va se positionner au début
+                        if self.filename != self.filenames[self.selection] : # we have selected a new rb, we will position ourselves at the start
                             self.filename = self.filenames[self.selection]
                             rbconfig['Roadbooks']['etape'] = self.filenames[self.selection]
                             rbconfig['Roadbooks']['case'] = '0'
                             save_rbconfig()
-                        self.k = self.j + self.countdown + 1 # hack pour afficher le message chargement en cours
+                        self.k = self.j + self.countdown + 1 # hack to display the message loading
                         if self.rallye == 'Zoom' :
                             self.SwitchToScene(RoadbookZoomScene(self.filename))
                         else :
@@ -1955,7 +1955,7 @@ class RoadbookScene(SceneBase):
 
         old_distance1 = distance1
 
-        #Chargement des images
+        #Loading images
         fichiers = sorted([name for name in os.listdir('/mnt/piusb/Conversions/'+filedir) if os.path.isfile(os.path.join('/mnt/piusb/Conversions/'+filedir, name))])
         self.nb_cases = len(fichiers)
         self.case = int(rbconfig['Roadbooks']['case'])
@@ -1966,7 +1966,7 @@ class RoadbookScene(SceneBase):
         samplepage = pygame.image.load (os.path.join('/mnt/piusb/Conversions/'+filedir,fichiers[0]))
         (w,h) = samplepage.get_rect().size
         rb_ratio = min(480/w,150/h) if self.orientation == 'Portrait' else min(500/w,160/h)
-        # Mise à l'échelle des images
+        # Image scaling
         self.nh = h * rb_ratio
 
         if mode_jour :
@@ -1990,7 +1990,7 @@ class RoadbookScene(SceneBase):
                 if event.key == pygame.K_ESCAPE:
                     self.Terminate()
 
-                # les actions sur le widget courant
+                # actions on the current widget
                 elif event.key == BOUTON_RIGHT:
                     widgets[(current_widget)].select()
                     widget_select_t = time.time()
@@ -2024,7 +2024,7 @@ class RoadbookScene(SceneBase):
                     widget_select_t = time.time()
                     widget_isselected = True
                     widgets[(current_widget)].downdown()
-                # les actions de deroulement du rb
+                # the actions of unwinding of the rb
                 elif event.key == BOUTON_UP:
                     self.oldcase = self.case
                     self.case -= 1
@@ -2036,7 +2036,7 @@ class RoadbookScene(SceneBase):
                 elif event.key == BOUTON_PGDOWN:
                     self.case = self.nb_cases - ncases
 
-        # Action sur le dérouleur
+        # Action on the unwinder
         if self.case > self.nb_cases - ncases :
             self.case = self.nb_cases - ncases
         if self.case < 0 :
@@ -2068,7 +2068,7 @@ class RoadbookScene(SceneBase):
                         sprites['{}'.format(n)] = (get_image(self.case+n,angle,mode_jour),(800-(ncases-n)*self.nh-(ncases-n-1),0))
             self.oldcase=self.case
 
-        # Deselectionne le widget au bout de 10 secondes
+        # Deselect widget after 10 secondss
         if widget_isselected and not widget_iscountdown:
             if time.time() - widget_select_t > 10 :
                 widgets[(current_widget)].deselect()
@@ -2077,7 +2077,7 @@ class RoadbookScene(SceneBase):
 
         # Update widget info
         save_t = time.time()
-        if ( save_t - save_t_moy >= 1) : # Vitesse moyenne sur 1 seconde
+        if ( save_t - save_t_moy >= 1) : # Average speed over 1 second
             speed = (totalisateur-old_totalisateur)*3.6/(save_t-save_t_moy)/1000;
             save_t_moy = save_t
             old_totalisateur = totalisateur
@@ -2088,9 +2088,9 @@ class RoadbookScene(SceneBase):
         for j in list(widgets.keys()):
             widgets[j].update()
 
-        # Sauvegarde de l'odometre, distances et temps de depart de chrono toutes les 5 secondes
+        # Saving of the odometer, distances and start times every 5 seconds
         k = time.time()
-        if k - save_t_odo >= 5 : # On sauvegarde l'odometre toutes les 5 secondes
+        if k - save_t_odo >= 5 : # We save the odometer every 5 secondss
             odoconfig['Odometre']['Totalisateur'] = str(totalisateur)
             odoconfig['Odometre']['Distance1'] = str(distance1)
             odoconfig['Odometre']['Distance2'] = str(distance2)
@@ -2107,7 +2107,7 @@ class RoadbookScene(SceneBase):
 
     def Render(self, screen):
         global widgets,current_widget,old_widget
-        # Positionnement des différents éléments d'affichage, s'ils ont été modifiés
+        # Positioning of the different display elements, if they have been modified
         update_sprites(screen)
         for j in list(widgets.keys()):
             widgets[j].render(screen)
@@ -2116,7 +2116,7 @@ class RoadbookScene(SceneBase):
 
 
 #*******************************************************************************************************#
-#---------------------------------------- Ecran Compteur de vitesse simple -----------------------------#
+#---------------------------------------- Single Speedometer screen -----------------------------#
 #*******************************************************************************************************#
 
 class OdometerScene(SceneBase):
@@ -2139,7 +2139,7 @@ class OdometerScene(SceneBase):
         self.orientation = setupconfig['Parametres']['orientation']
         angle = 90 if self.orientation == 'Portrait' else 0
 
-        self.index = 0 # totalisateur par defaut
+        self.index = 0 # default totalizer
 
         roue = int(setupconfig['Parametres']['roue'])
         aimants = int(setupconfig['Parametres']['aimants'])
@@ -2168,7 +2168,7 @@ class OdometerScene(SceneBase):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.Terminate()
-                # les actions sur le widget courant
+                # actions on the current widget
                 elif event.key == BOUTON_OK:
                     widgets[(0)].reset()
                 elif event.key == BOUTON_BACKSPACE:
@@ -2282,7 +2282,7 @@ class RoadbookZoomScene(SceneBase):
                 if event.key == pygame.K_ESCAPE:
                     self.Terminate()
 
-                # les actions sur le widget courant
+                # actions on the current widget
                 elif event.key == BOUTON_RIGHT:
                     widgets[(current_widget)].select()
                     widget_select_t = time.time()
@@ -2319,7 +2319,7 @@ class RoadbookZoomScene(SceneBase):
                 elif event.key == BOUTON_PGDOWN:
                     self.case = self.nb_cases - self.ncases
 
-        # Action sur le dérouleur
+        # Action on the unwinder
         if self.case > self.nb_cases - self.ncases :
             self.case = self.nb_cases -self.ncases
         if self.case < 0 :
@@ -2370,7 +2370,7 @@ class RoadbookZoomScene(SceneBase):
 
         # Saving of the odometer, distances and start times of the chrono every 5 seconds
         k = time.time()
-        if k - save_t_odo >= 5 : # On sauvegarde l'odometre toutes les 5 secondes
+        if k - save_t_odo >= 5 : # We save the odometer every 5 seconds
             odoconfig['Odometre']['Totalisateur'] = str(totalisateur)
             odoconfig['Odometre']['Distance1'] = str(distance1)
             odoconfig['Odometre']['Distance2'] = str(distance2)
@@ -2387,7 +2387,7 @@ class RoadbookZoomScene(SceneBase):
     def Render(self, screen):
         global widgets
         update_sprites(screen)
-        # Positionnement des différents éléments d'affichage, s'ils ont été modifiés
+        # Positioning of the different display elements, if they have been modified
         widgets[(0)].render(screen)
 
 #*******************************************************************************************************#
