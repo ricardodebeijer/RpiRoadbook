@@ -402,7 +402,7 @@ def get_image(key,angle=0,mode_jour=True):
     global filedir,fichiers,image_cache
     # Loading images only if not yet cached
     if not (key,angle,mode_jour) in image_cache:
-        img = pygame.image.load(os.path.join(''+filedir,fichiers[key]))
+        img = pygame.image.load(os.path.join('converted_images',fichiers[key]))
         if mode_jour:
             s = img
         else :
@@ -1627,7 +1627,7 @@ class SelectionScene(SceneBase):
         self.selection= 0 ;
         self.fenetre = 0 ;
         self.saved = rbconfig['Roadbooks']['etape'] ;
-        self.filenames = [f for f in os.listdir('/') if re.search('.pdf$', f)]
+        self.filenames = [f for f in os.listdir('../Roadbooks') if re.search('.pdf$', f)]
         if len(self.filenames) == 0 : self.SwitchToScene(NoneScene())
         if self.saved in self.filenames : # le fichier rb existe, on le préselectionne
             self.filename = self.saved
@@ -1960,14 +1960,14 @@ class RoadbookScene(SceneBase):
         old_distance1 = distance1
 
         #Loading images
-        fichiers = sorted([name for name in os.listdir(''+filedir) if os.path.isfile(os.path.join(''+filedir, name))])
+        fichiers = sorted([name for name in os.listdir('converted_images') if os.path.isfile(os.path.join('converted_images', name))])
         self.nb_cases = len(fichiers)
         self.case = int(rbconfig['Roadbooks']['case'])
         if self.case < 0 :
             self.case = 0 # on compte de 0 à longueur-1
         self.oldcase = self.case + 1
 
-        samplepage = pygame.image.load (os.path.join(''+filedir,fichiers[0]))
+        samplepage = pygame.image.load (os.path.join('converted_images',fichiers[0]))
         (w,h) = samplepage.get_rect().size
         rb_ratio = min(480/w,150/h) if self.orientation == 'Portrait' else min(500/w,160/h)
         # Image scaling
@@ -2253,14 +2253,14 @@ class RoadbookZoomScene(SceneBase):
         developpe = 1.0*roue / aimants
 
         # Loading images
-        fichiers = sorted([name for name in os.listdir(''+filedir) if os.path.isfile(os.path.join(''+filedir, name))])
+        fichiers = sorted([name for name in os.listdir('converted_images') if os.path.isfile(os.path.join('converted_images', name))])
         self.nb_cases = len(fichiers)
         self.case = int(rbconfig['Roadbooks']['case'])
         if self.case < 0 :
             self.case = 0 # on compte de 0 à longueur-1
         self.oldcase = self.case + 1
 
-        samplepage = pygame.image.load (os.path.join(''+filedir,fichiers[0]))
+        samplepage = pygame.image.load (os.path.join('/home/ricardo/Documents/GitLinux/RpiRoadBook/RpiRoadbook/converted_images/',fichiers[0]))
         (w,h) = samplepage.get_rect().size
         rb_ratio = 480/w if self.orientation == 'Portrait' else min(800/w,240/h)
         # Image scaling
