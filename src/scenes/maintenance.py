@@ -6,13 +6,13 @@ from scenes.base import BaseScene
 with contextlib.redirect_stdout(None):
     import pygame
 
-# Home scene
-class HomeScene(BaseScene):
+# Maintenance scene
+class MaintenanceScene(BaseScene):
     def __init__(self, fname=''):
         BaseScene.__init__(self)
         self.next = self
         self.filename = fname
-        self.title = 'Home'
+        self.title = 'Maintenance'
 
     def ProcessInput(self, events, pressed_keys):
         pass
@@ -21,5 +21,5 @@ class HomeScene(BaseScene):
     #     pass
 
     # def Render(self, screen):
-    #     print('Render Home')
+    #     print('Render Maintenance')
     #     super().Render(screen)
