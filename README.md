@@ -15,32 +15,36 @@ For a system on board a motorcycle, the problem is the power of the rpi and the 
 
 Switching to on-board vehicles meets different needs: quick start-up and security in the event of a power failure. This means in particular a read-only memory card: no corruption of the memory card in the event of untimely extinction. There is just a partition on the card that is in write mode, to save user data from time to time. Creating your own operating system takes a long time, because you have to select the necessary elements and reject the others, then compile from source code. Usually, these files are created on the architecture that will receive the system. For example on PC for PC, on a Mac for Mac, etc. If we do it on the Rpi, it's long. Very long. So it's about using the power of your computer to generate more quickly the code that the Rpi will understand. This is called Cross-compilation. This is the subject of the following chapter: Builroot.
 
-### Tried for Windows, did not work
-- Download a version of [Make](https://sourceforge.net/projects/gnuwin32/files/make/3.81/make-3.81.exe/download?use_mirror=netix&download=)
-- Add `make` to `PATH`
-- Download a version of [BuildRoot](https://buildroot.org/download.html)
-- Extract BuildRoot using `tar xvjf buildroot-XXXX`
-- Download a version of [Python 3](https://www.python.org/downloads/)
-- Add `python` to `PATH`
-- Have `Microsoft Visual C++ Build Tools` installed from [Visual Studio](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017), see [this](https://github.com/benfred/implicit/issues/76#issuecomment-404889398) for help
-- Change directory into the `RpiRoadbook` src folder
-- run `pip install -r requirements.txt`
 
-## Dependencies
+## Requirements
+### Software on your computer (build machine)
+- git
+- mercurial
+- linux build tools in order to run make
 
-* `libsdl1.2-dev`
-* `python-pygame`
+## Hardware for RpiRoadbook
+- Raspberry Pi (3 Model B+, in my case)
+- A screen for the Raspberry Pi (7 inch touchscreen with enclosure my case)
 
 
 ## Buildroot and Raspberry Pi
 _Use a Linux system, because `make` in combination with Buildroot does not work on Windows as far as I tested_
 
 - `cd` to the /buildroot folder this project
-- Using the following guide: https://www.blaess.fr/christophe/articles/creer-un-systeme-complet-avec-buildroot/, do these steps:
+- Using the following guide: https://www.blaess.fr/christophe/articles/creer-un-systeme-complet-avec-buildroot/ (Translated to English) do these steps:
 - Download Buildroot `wget http://www.buildroot.org/downloads/buildroot-2019.02.tar.bz2`
 - Extract with: `tar xf buildroot-2019.02.tar.bz2`
 - Go into folder: `cd buildroot-2019.02`
 - Create `.config` for Raspberry Pi 3 with: `make raspberrypi3_defconfig`
+
+### version 2
+- Overwrite the `.config` created, with the config provided in `/board/rpi-3/buildroot-2019.02.9-raspberrypi-3-python.config`
+- Run `make`. _Note: this takes a while (+- 1 hour)_
+- List all your current disks with `lsblk`, now plug your SD card in and run `lsblk` again, notice which disk is added (in my case `sdb`)
+- Unmount all partitions of that disk with `umount /dev/sdb?`
+- Finally install the generated image on the SD card with: `sudo cp output/images/sdcard.img /dev/sdb`
+
+### version 1
 - Overwrite the `.config` created, with the config provided in `/board/rpi-3/buildroot-2019.02-toolchain.config`
 - Create toolchain for the first time: `make toolchain`. _Note: this takes a while (+- 1 hour)_
 - When setting up the toolchain is done, we can start on the actual system.
@@ -59,6 +63,19 @@ _Use a Linux system, because `make` in combination with Buildroot does not work 
 - Copy new image to SD card again `sudo cp output/images/sdcard.img /dev/sdb`
 
 
+
+
+### Tried for Windows, did not work
+- Download a version of [Make](https://sourceforge.net/projects/gnuwin32/files/make/3.81/make-3.81.exe/download?use_mirror=netix&download=)
+- Add `make` to `PATH`
+- Download a version of [BuildRoot](https://buildroot.org/download.html)
+- Extract BuildRoot using `tar xvjf buildroot-XXXX`
+- Download a version of [Python 3](https://www.python.org/downloads/)
+- Add `python` to `PATH`
+- Have `Microsoft Visual C++ Build Tools` installed from [Visual Studio](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017), see [this](https://github.com/benfred/implicit/issues/76#issuecomment-404889398) for help
+- Change directory into the `RpiRoadbook` src folder
+- run `pip install -r requirements.txt`
+
 # testing out normal raspberry pi config
 - using `make raspberrypi3_defconfig` with no changes to the config
 - and doing `make` (takes a while)
@@ -66,9 +83,8 @@ _Use a Linux system, because `make` in combination with Buildroot does not work 
 
 
 ## Python application / PDF reader / Trip
-In order to get the Python application of /RpiRoadbook on the raspberry pi (and boot by default) we need to do some extra steps.python -m pip install --upgrade pip setuptools whe
-...
+In order to get the Python application of /RpiRoadbook on the raspberry pi (and boot by default) we need to do some extra steps
 
 
 ## Remote control
-To come up...
+SSH is enabled by default for both root and rpi user.
